@@ -31,7 +31,7 @@ def start(message):
 Я бот-помічник у пошуку найблищого *бомбосховища*.
 Для того щоб почати *пошук*, використайте команду _/search_.
 
-_*зараз нажаль бот працюэ лише у Львові._
+_*зараз, на жаль, бот працюэ лише у Львові._
     '''
     bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
 
@@ -39,9 +39,10 @@ _*зараз нажаль бот працюэ лише у Львові._
 @bot.message_handler(commands=["search"])
 def search_start(message):
     msg = '''
-    Для початку надішліть нам свою геолокацію через телеграм, або напишіть адрес свого місцерозтошування.
-
-Приклад написання адреси власноруч: _проспект Свободи, 28, Львів, Львівська область_.
+    Спершу, надішліть свою геолокацію за допомогою функції у телеграм, або напишіть її власноруч за зразком.
+ 
+Зразок написання адреси:
+_проспект Свободи, 28, Львів, Львівська область_.
     '''
     send = bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
     bot.register_next_step_handler(send, loc_send)
@@ -56,13 +57,13 @@ def loc_send(message, frm=0, to=10):
         loc = geocode(message.text)
         if loc is None:
             msg = '''
-            Нажаль ми не змогли розпізнати ваше місцерозташування, спробуйте задати адресу точніше.
+            На жаль, ми не могли розпізнати ваше місце розташування, спробуйте задати адресу точніше.
             '''
             send = bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
             bot.register_next_step_handler(send, loc_send)
             return
     lst = data.closest(loc, frm, to)
-    msg = "Ось декілька сховишь, які ми знайшли для вас:\n"
+    msg = "Ось декілька сховищ, які ми знайшли для вас:\n"
     for el in lst:
         lat_lon = f"{el[0]},{el[1]}"
         msg += f"▹ [{el[2]}](https://www.google.com/maps/place/{lat_lon}).\n"
@@ -83,11 +84,11 @@ def more_search(message, frm, to):
 @bot.message_handler(commands=["support"])
 def support(message):
     msg = '''
-    Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишите @nick_ishchenko або @mar1cha.
+    Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишіть nick_ishchenko або @mar1cha.
     
 Адреси бомбосховищ взяті з сайту map.city-adm.lviv.ua
 
-(Повідомляйте команду, якщо укриття не актуальні).
+_(Повідомляйте команду про не актуальні укриття)_.
     '''
     bot.send_message(message.chat.id, msg, reply_markup=hide)
 
