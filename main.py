@@ -84,6 +84,10 @@ def more_search(message, frm, to):
 def support(message):
     msg = '''
     Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишите @nick_ishchenko або @mar1cha.
+    
+Адреси бомбосховищ взяті з сайту map.city-adm.lviv.ua
+
+(Повідомляйте команду, якщо укриття не актуальні).
     '''
     bot.send_message(message.chat.id, msg, reply_markup=hide)
 

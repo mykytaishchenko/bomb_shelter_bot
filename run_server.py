@@ -20,7 +20,7 @@ def get_message():
 @server.route('/', methods=["GET"])
 def index():
     bot.remove_webhook()
-    bot.set_webhook(url="https://{}.herokuapp.com/{}".format(config.get("name"), conf.get("token")))
+    bot.set_webhook(url="https://{}.herokuapp.com/{}".format(conf.get("name"), conf.get("token")))
     return "Hello from Heroku!", 200
 
 
