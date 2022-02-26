@@ -1,7 +1,5 @@
 import telebot
 from telebot import types
-from telebot.async_telebot import AsyncTeleBot
-import asyncio
 
 from config import Config
 from geocoder import geocode
@@ -11,7 +9,7 @@ conf = Config("data/config.csv")
 hide = types.ReplyKeyboardRemove()
 data = Data()
 
-bot = AsyncTeleBot(conf.get("token"))
+bot = telebot.TeleBot(conf.get("token"))
 
 
 def set_my_commands(commands: list):
@@ -19,14 +17,14 @@ def set_my_commands(commands: list):
     bot.set_my_commands([telebot.types.BotCommand(f"/{cmd[0]}", cmd[1]) for cmd in commands])
 
 
-async def new_keyword(btns: list):
+def new_keyword(btns: list):
     keyword = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     keyword.add(*[types.KeyboardButton(txt) for txt in btns])
     return keyword
 
 
 @bot.message_handler(commands=["start"])
-async def start(message):
+def start(message):
     msg = '''
     *Слава Україні!*
 
@@ -35,11 +33,11 @@ async def start(message):
 
 _*зараз, на жаль, бот працює лише у Львові._
     '''
-    await bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
+    bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
 
 
 @bot.message_handler(commands=["search"])
-async def search_start(message):
+def search_start(message):
     msg = '''
     Спершу, надішліть свою геолокацію за допомогою функції у телеграм, або напишіть її власноруч за зразком.
  
@@ -47,10 +45,10 @@ async def search_start(message):
 _проспект Свободи, 28, Львів, Львівська область_.
     '''
     send = bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
-    await bot.register_next_step_handler(send, loc_send)
+    bot.register_next_step_handler(send, loc_send)
 
 
-async def loc_send(message, frm=0, to=10):
+def loc_send(message, frm=0, to=10):
     if message.text is not None and message.text.startswith("/"):
         return
     if message.location is not None:
@@ -62,29 +60,29 @@ async def loc_send(message, frm=0, to=10):
             На жаль, ми не могли розпізнати ваше місце розташування, спробуйте задати адресу точніше.
             '''
             send = bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
-            await bot.register_next_step_handler(send, loc_send)
+            bot.register_next_step_handler(send, loc_send)
             return
     lst = data.closest(loc, frm, to)
     msg = "Ось декілька сховищ, які ми знайшли для вас:\n"
     for el in lst:
         lat_lon = f"{el[0]},{el[1]}"
         msg += f"▹ [{el[2]}](https://www.google.com/maps/place/{lat_lon}).\n"
-    await bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
+    bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
     send = bot.send_message(message.chat.id, "Показати більше варіантів?", reply_markup=new_keyword(["Так", "Ні"]),
                             parse_mode="markdown")
     bot.register_next_step_handler(send, more_search, frm, to)
 
 
-async def more_search(message, frm, to):
+def more_search(message, frm, to):
     if message.text == "Так":
-        await loc_send(message, frm + 10, to + 10)
+        loc_send(message, frm + 10, to + 10)
     else:
-        await bot.send_message(message.chat.id, "Не панікуйте та швидко прямуйте до сховища.", reply_markup=hide,
+        bot.send_message(message.chat.id, "Не панікуйте та швидко прямуйте до сховища.", reply_markup=hide,
                          parse_mode="markdown")
 
 
 @bot.message_handler(commands=["support"])
-async def support(message):
+def support(message):
     msg = '''
     Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишіть @nick_ishchenko або @mar1cha.
     
@@ -92,11 +90,11 @@ async def support(message):
 
 _(Повідомляйте команду про не актуальні укриття)_.
     '''
-    await bot.send_message(message.chat.id, msg, reply_markup=hide)
+    bot.send_message(message.chat.id, msg, reply_markup=hide)
 
 
 @bot.message_handler(commands=["important"])
-async def important(message):
+def important(message):
     msg = '''
     *ВАЖЛИВА ІНФОРМАЦІЯ*
     
@@ -148,9 +146,9 @@ async def important(message):
 
 *Слава Україні та нашим Захисникам! Разом переможемо! 🇺🇦*
     '''
-    await bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
+    bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
 
 
 if __name__ == "__main__":
     set_my_commands(conf.commands)
-    asyncio.run(bot.polling(none_stop=True))
+    bot.polling(none_stop=True)
