@@ -151,4 +151,4 @@ def important(message):
 
 if __name__ == "__main__":
     set_my_commands(conf.commands)
-    bot.polling(none_stop=True)
+    # bot.polling(none_stop=True)
