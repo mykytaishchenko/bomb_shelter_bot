@@ -1,5 +1,7 @@
 import telebot
 from telebot import types
+from telebot.async_telebot import AsyncTeleBot
+import asyncio
 
 from config import Config
 from geocoder import geocode
@@ -9,22 +11,22 @@ conf = Config("data/config.csv")
 hide = types.ReplyKeyboardRemove()
 data = Data()
 
-bot = telebot.TeleBot(conf.get("token"))
+bot = AsyncTeleBot(conf.get("token"))
 
 
-def set_my_commands(commands: list):
+async def set_my_commands(commands: list):
     bot.delete_my_commands()
     bot.set_my_commands([telebot.types.BotCommand(f"/{cmd[0]}", cmd[1]) for cmd in commands])
 
 
-def new_keyword(btns: list):
+async def new_keyword(btns: list):
     keyword = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     keyword.add(*[types.KeyboardButton(txt) for txt in btns])
     return keyword
 
 
 @bot.message_handler(commands=["start"])
-def start(message):
+async def start(message):
     msg = '''
     *Слава Україні!*
 
@@ -37,7 +39,7 @@ _*зараз, на жаль, бот працює лише у Львові._
 
 
 @bot.message_handler(commands=["search"])
-def search_start(message):
+async def search_start(message):
     msg = '''
     Спершу, надішліть свою геолокацію за допомогою функції у телеграм, або напишіть її власноруч за зразком.
  
@@ -48,7 +50,7 @@ _проспект Свободи, 28, Львів, Львівська облас�
     bot.register_next_step_handler(send, loc_send)
 
 
-def loc_send(message, frm=0, to=10):
+async def loc_send(message, frm=0, to=10):
     if message.text is not None and message.text.startswith("/"):
         return
     if message.location is not None:
@@ -73,7 +75,7 @@ def loc_send(message, frm=0, to=10):
     bot.register_next_step_handler(send, more_search, frm, to)
 
 
-def more_search(message, frm, to):
+async def more_search(message, frm, to):
     if message.text == "Так":
         loc_send(message, frm + 10, to + 10)
     else:
@@ -82,7 +84,7 @@ def more_search(message, frm, to):
 
 
 @bot.message_handler(commands=["support"])
-def support(message):
+async def support(message):
     msg = '''
     Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишіть @nick_ishchenko або @mar1cha.
     
@@ -94,7 +96,7 @@ _(Повідомляйте команду про не актуальні укр�
 
 
 @bot.message_handler(commands=["important"])
-def important(message):
+async def important(message):
     msg = '''
     *ВАЖЛИВА ІНФОРМАЦІЯ*
     
@@ -151,4 +153,4 @@ def important(message):
 
 if __name__ == "__main__":
     set_my_commands(conf.commands)
-    bot.polling(none_stop=True)
+    asyncio.run(bot.polling(none_stop=True))
