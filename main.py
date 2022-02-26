@@ -1,5 +1,6 @@
 import telebot
 from telebot import types
+from telebot.async_telebot import AsyncTeleBot
 
 from config import Config
 from geocoder import geocode
@@ -9,7 +10,7 @@ conf = Config("data/config.csv")
 hide = types.ReplyKeyboardRemove()
 data = Data()
 
-bot = telebot.TeleBot(conf.get("token"))
+bot = AsyncTeleBot(conf.get("token"))
 
 
 def set_my_commands(commands: list):
