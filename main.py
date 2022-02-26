@@ -14,7 +14,7 @@ data = Data()
 bot = AsyncTeleBot(conf.get("token"))
 
 
-async def set_my_commands(commands: list):
+def set_my_commands(commands: list):
     bot.delete_my_commands()
     bot.set_my_commands([telebot.types.BotCommand(f"/{cmd[0]}", cmd[1]) for cmd in commands])
 
@@ -35,7 +35,7 @@ async def start(message):
 
 _*зараз, на жаль, бот працює лише у Львові._
     '''
-    bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
+    await bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
 
 
 @bot.message_handler(commands=["search"])
@@ -47,7 +47,7 @@ async def search_start(message):
 _проспект Свободи, 28, Львів, Львівська область_.
     '''
     send = bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
-    bot.register_next_step_handler(send, loc_send)
+    await bot.register_next_step_handler(send, loc_send)
 
 
 async def loc_send(message, frm=0, to=10):
@@ -62,14 +62,14 @@ async def loc_send(message, frm=0, to=10):
             На жаль, ми не могли розпізнати ваше місце розташування, спробуйте задати адресу точніше.
             '''
             send = bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
-            bot.register_next_step_handler(send, loc_send)
+            await bot.register_next_step_handler(send, loc_send)
             return
     lst = data.closest(loc, frm, to)
     msg = "Ось декілька сховищ, які ми знайшли для вас:\n"
     for el in lst:
         lat_lon = f"{el[0]},{el[1]}"
         msg += f"▹ [{el[2]}](https://www.google.com/maps/place/{lat_lon}).\n"
-    bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
+    await bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
     send = bot.send_message(message.chat.id, "Показати більше варіантів?", reply_markup=new_keyword(["Так", "Ні"]),
                             parse_mode="markdown")
     bot.register_next_step_handler(send, more_search, frm, to)
@@ -77,9 +77,9 @@ async def loc_send(message, frm=0, to=10):
 
 async def more_search(message, frm, to):
     if message.text == "Так":
-        loc_send(message, frm + 10, to + 10)
+        await loc_send(message, frm + 10, to + 10)
     else:
-        bot.send_message(message.chat.id, "Не панікуйте та швидко прямуйте до сховища.", reply_markup=hide,
+        await bot.send_message(message.chat.id, "Не панікуйте та швидко прямуйте до сховища.", reply_markup=hide,
                          parse_mode="markdown")
 
 
@@ -92,7 +92,7 @@ async def support(message):
 
 _(Повідомляйте команду про не актуальні укриття)_.
     '''
-    bot.send_message(message.chat.id, msg, reply_markup=hide)
+    await bot.send_message(message.chat.id, msg, reply_markup=hide)
 
 
 @bot.message_handler(commands=["important"])
@@ -148,7 +148,7 @@ async def important(message):
 
 *Слава Україні та нашим Захисникам! Разом переможемо! 🇺🇦*
     '''
-    bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
+    await bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
 
 
 if __name__ == "__main__":
