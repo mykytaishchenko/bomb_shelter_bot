@@ -48,13 +48,13 @@ _проспект Свободи, 28, Львів, Львівська облас�
     bot.register_next_step_handler(send, loc_send)
 
 
-def loc_send(message, frm=0, to=10):
+async def loc_send(message, frm=0, to=10):
     if message.text is not None and message.text.startswith("/"):
         return
     if message.location is not None:
         loc = (message.location.latitude, message.location.longitude)
     else:
-        loc = geocode(message.text)
+        loc = await geocode(message.text)
         if loc is None:
             msg = '''
             На жаль, ми не могли розпізнати ваше місце розташування, спробуйте задати адресу точніше.
@@ -151,4 +151,4 @@ def important(message):
 
 if __name__ == "__main__":
     set_my_commands(conf.commands)
-    # bot.polling(none_stop=True)
+    bot.polling(none_stop=True)
