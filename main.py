@@ -31,7 +31,7 @@ def start(message):
 Я бот-помічник у пошуку найблищого *бомбосховища*.
 Для того щоб почати *пошук*, використайте команду _/search_.
 
-_*зараз, на жаль, бот працюэ лише у Львові._
+_*зараз, на жаль, бот працює лише у Львові._
     '''
     bot.send_message(message.chat.id, msg, reply_markup=hide, parse_mode="markdown")
 
@@ -84,7 +84,7 @@ def more_search(message, frm, to):
 @bot.message_handler(commands=["support"])
 def support(message):
     msg = '''
-    Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишіть nick_ishchenko або @mar1cha.
+    Знайшли у боті помилки або некоректну працю, помітили недійсні сховища або бажаєте доповнити реєстр сховищ - пишіть @nick_ishchenko або @mar1cha.
     
 Адреси бомбосховищ взяті з сайту map.city-adm.lviv.ua
 
